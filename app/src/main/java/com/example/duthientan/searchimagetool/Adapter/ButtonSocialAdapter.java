@@ -54,11 +54,13 @@ public class ButtonSocialAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int position) {
+        System.out.println(position);
         return position;
     }
 
     @Override
     public long getItemId(int position) {
+        System.out.println(position);
         return position;
     }
 
@@ -66,7 +68,8 @@ public class ButtonSocialAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View btnView = inflater.inflate(R.layout.buton_social, null);
         Button button = (Button) btnView.findViewById(R.id.btn_sc);
-        button.setBackgroundResource(show[position].idButton);
+        //button.setBackgroundResource(show[position].idButton);
+        button.setText(show[position].mSocial.getButtonName());
         return btnView;
     }
 

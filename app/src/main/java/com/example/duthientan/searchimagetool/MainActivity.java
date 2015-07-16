@@ -10,20 +10,20 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 
 import com.example.duthientan.searchimagetool.Adapter.ButtonSocialAdapter;
 import com.example.duthientan.searchimagetool.Adapter.ButtonSocial;
-import com.example.duthientan.searchimagetool.Backend.ApiSocial;
-import com.example.duthientan.searchimagetool.Backend.OAuthSocial;
 import com.example.duthientan.searchimagetool.Utils.Sharepreferences;
-
-import org.scribe.builder.api.TwitterApi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,19 +39,17 @@ public class MainActivity extends AppCompatActivity {
     Toolbar toolbar;
     private ButtonSocial[] mSocials;
     ButtonSocialAdapter mAdapter;
-    int[] idImage = new int[]{R.drawable.twitter,R.drawable.twitter,R.drawable.instagram,R.drawable.twitter,R.drawable.twitter};
+    int[] idImage = new int[]{R.drawable.twitter, R.drawable.twitter, R.drawable.instagram, R.drawable.twitter, R.drawable.twitter};
 
     public MainActivity() {
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        android.provider.Settings.System.putString(getApplicationContext().getContentResolver(),android.provider.Settings.System.WIFI_STATIC_DNS1, "8.8.8.8");
-        android.provider.Settings.System.putString(getApplicationContext().getContentResolver(),android.provider.Settings.System.WIFI_STATIC_DNS2, "8.8.4.4");
         super.onCreate(savedInstanceState);
         contextOfApplication = getApplicationContext();
         setContentView(R.layout.activity_main);
-        share = new Sharepreferences();
+        share = new Sharepreferences(getApplicationContext());
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         FAB = (ImageButton) findViewById(R.id.imageButton);
         listView = (ListView) findViewById(R.id.list_view);
@@ -139,18 +137,20 @@ public class MainActivity extends AppCompatActivity {
                 new ButtonSocial("image", share.getShared()[4])
         };
         final List<String> list = new ArrayList<>();
-        for(ButtonSocial social: mSocials){
+        for (ButtonSocial social : mSocials) {
             if (social.isChecked())
                 list.add(social.getButtonName());
         }
-        mAdapter = new ButtonSocialAdapter(this,mSocials,idImage);
+
+        mAdapter = new ButtonSocialAdapter(this, mSocials, idImage);
         listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    switch (list.get(position)){
-                        case "twitter":
-                    }
+                Button button = (Button) view.findViewById(R.id.btn_sc);
+                Intent intent = new Intent(MainActivity.this, WebViewActivity.class);
+                intent.putExtra("Social", button.getText());
+                startActivity(intent);
             }
         });
     }

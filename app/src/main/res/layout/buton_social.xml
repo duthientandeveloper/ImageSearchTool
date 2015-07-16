@@ -6,7 +6,9 @@
         android:id="@+id/btn_sc"
         android:layout_gravity="center"
         android:text=""
-        android:layout_width="180dp"
-        android:layout_height="34dp"
+        android:focusable="false"
+        android:clickable="false"
+        android:layout_width="300px"
+        android:layout_height="100px"
         />
 </LinearLayout>

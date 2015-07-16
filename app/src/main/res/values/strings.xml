@@ -7,5 +7,8 @@
     <string name="title_activity_setting">Setting</string>
     <string name="title_activity_web_view">WebViewActivity</string>
 
-    <string name="hello_world">Hello world!</string>g>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_search">SearchActivity</string>
+    <string name="title_activity_image_online">ImageOnline</string>
+    <string name="title_activity_folder_image">FolderImageActivity</string>g>
 </resources>

@@ -48,7 +48,6 @@
                 android:divider="@null"
                 android:dividerHeight="0dp">
             </ListView>
-
             <ImageButton
                 android:id="@+id/imageButton"
                 android:layout_width="70dp"

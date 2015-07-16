@@ -1,23 +1,57 @@
 package com.example.duthientan.searchimagetool;
 
-import android.support.v7.app.ActionBarActivity;
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
+
+import com.example.duthientan.searchimagetool.Backend.ApiSocial;
+import com.example.duthientan.searchimagetool.Backend.OAuthSocial;
+import com.example.duthientan.searchimagetool.Utils.L;
 
 
-public class WebViewActivity extends ActionBarActivity {
+public class WebViewActivity extends Activity {
 
+    OAuthSocial mSocial;
     WebView mWebView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState); 
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web_view);
         mWebView = (WebView)findViewById(R.id.webView);
         mWebView.getSettings().setJavaScriptEnabled(true);
-        
+        mWebView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                if (url.contains("https://www.google.com/?oauth_token=")) {
+                    String key = "&oauth_verifier=";
+                    int start = url.indexOf(key) + key.length();
+                    Intent intent =new Intent(WebViewActivity.this,SearchActivity.class);
+                    intent.putExtra("verifier",url.substring(start));
+                    intent.putExtra("Social",getIntent().getStringExtra("Social"));
+                    startActivity(intent);
+                    finish();
+                }
+                super.onPageFinished(view, url);
+            }
+        });
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                OAuthSocial.startOAuthSocial(getIntent().getStringExtra("Social"));
+            }
+        });
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        mWebView.loadUrl(OAuthSocial.getURL(getIntent().getStringExtra("Social")).toString());
     }
 
     @Override

@@ -6,6 +6,11 @@ import android.preference.PreferenceManager;
 
 import com.example.duthientan.searchimagetool.MainActivity;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
  * Created by Du Thien Tan on 7/9/2015.
  */
@@ -13,8 +18,8 @@ public class Sharepreferences {
     SharedPreferences pref;
     SharedPreferences.Editor editor;
 
-    public Sharepreferences() {
-        Context applicationContext = MainActivity.getContextOfApplication();
+    public Sharepreferences(Context context) {
+        Context applicationContext = context;
         pref = PreferenceManager.getDefaultSharedPreferences(applicationContext);
         editor = pref.edit();
     }
@@ -36,5 +41,39 @@ public class Sharepreferences {
         arrKey[3] = pref.getBoolean("px", false);
         arrKey[4] = pref.getBoolean("image", false);
         return arrKey;
+    }
+
+    public void setTag(String tag) {
+        Set<String> setTag = pref.getStringSet("tag", null);
+        if(setTag==null)
+            setTag =new HashSet<String>();
+        List<String> list = new ArrayList<String>();
+        list.addAll(setTag);
+
+        if(!list.contains(tag))
+            list.add(tag);
+        setTag = new HashSet<String>(list);
+        editor.putStringSet("tag", setTag);
+        editor.commit();
+    }
+    public void removeTag(String tag){
+        Set<String> setTag = pref.getStringSet("tag", null);
+        if(setTag==null)
+            setTag =new HashSet<String>();
+        List<String> list = new ArrayList<String>();
+        list.addAll(setTag);
+        if(list.remove(tag)){
+            setTag = new HashSet<String>(list);
+            editor.putStringSet("tag", setTag);
+            editor.commit();
+        }
+
+
+    }
+
+    public Set<String> getTag() {
+        Set<String> tag = new HashSet<String>();
+        tag = pref.getStringSet("tag", null);
+        return tag;
     }
 }
