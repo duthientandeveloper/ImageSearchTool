@@ -1,0 +1,139 @@
+package com.example.duthientan.searchimagetool;
+
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Toast;
+
+import com.example.duthientan.searchimagetool.Adapter.ImageAdapter;
+import com.example.duthientan.searchimagetool.Backend.ImageFile;
+import com.example.duthientan.searchimagetool.Backend.Instagam;
+import com.example.duthientan.searchimagetool.Backend.NonAuthention;
+import com.example.duthientan.searchimagetool.Backend.OAuthSocial;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+
+public class ImageOnline extends AppCompatActivity {
+
+    List<URL> mListURL = new ArrayList<URL>();
+    ImageAdapter mImageAdapter;
+    GridView mLayout;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_image_online);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getIntent().getStringExtra("Social").equals("image")) {
+
+            String[] url = getIntent().getStringArrayExtra("url");
+            for (String s : url) {
+                try {
+                    mListURL.add(new URL(s));
+
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }else if(getIntent().getStringExtra("Social").equals("instargram")){
+            if(getIntent().getBooleanExtra("Authention",true)) {
+
+
+                Instagam instagam = new Instagam(getIntent().getStringExtra("key"), getIntent().getStringExtra("access_token"));
+                List<String> media = instagam.getMediaCounts();
+                mListURL = instagam.getmURLs(media,true);
+            }else {
+
+                mListURL = NonAuthention.getResponeseUrl(getIntent().getStringExtra("Social"), getIntent().getStringExtra("key"));
+            }
+
+        }else {
+            if(getIntent().getStringExtra("access_token")==null){
+                if(getIntent().getStringExtra("Social").equals("twitter"))
+                    mListURL = OAuthSocial.getResponeseUrl(getIntent().getStringExtra("Social"), getIntent().getStringExtra("key"));
+                else
+                mListURL = NonAuthention.getResponeseUrl(getIntent().getStringExtra("Social"), getIntent().getStringExtra("key"));
+            }else {
+
+                mListURL = OAuthSocial.getResponeseUrl(getIntent().getStringExtra("Social"), getIntent().getStringExtra("key"));
+            }
+        }
+        mLayout = (GridView) findViewById(R.id.image_layout);
+        mImageAdapter = new ImageAdapter(ImageOnline.this, mListURL, 240);
+        mLayout.setAdapter(mImageAdapter);
+        mLayout.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+                final Bitmap[] image = new Bitmap[1];
+                ImageView imageView = new ImageView(ImageOnline.this);
+                imageView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            image[0] = BitmapFactory.decodeStream(mListURL.get(position).openConnection().getInputStream());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                thread.start();
+                try {
+                    thread.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                imageView.setImageBitmap(image[0]);
+                AlertDialog.Builder builder = new AlertDialog.Builder(ImageOnline.this);
+                builder.setView(imageView).setPositiveButton("Download", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ImageFile.saveImage(image[0], mListURL.get(position).toString(), getIntent().getStringExtra("key"));
+                        Toast.makeText(getApplicationContext(), "Downloaded", Toast.LENGTH_LONG).show();
+                    }
+                });
+                builder.create().show();
+            }
+        });
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_image_online, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                if (!getIntent().getStringExtra("Social").equals("image")) {
+                    startActivity(new Intent(ImageOnline.this, SearchActivity.class).putExtra("Social", getIntent().getStringExtra("Social")));
+                    finish();
+                } else finish();
+                return true;
+            case R.id.folder:
+                startActivity(new Intent(ImageOnline.this, FolderImageActivity.class));
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+}

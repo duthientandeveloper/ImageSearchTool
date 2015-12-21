@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.duthientan.searchimagetool.ImageOnline">
+    <item android:id="@+id/folder"
+        android:icon="@drawable/folder"
+        android:title="folder"
+        app:showAsAction="always" />
+
+</menu>
+<!-- From: file:/E:/Android%20Project/SearchImageTool/app/src/main/res/menu/menu_image_online.xml -->

@@ -1,0 +1,5 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.duthientan.searchimagetool.ImageSearchOnline"></menu>
+<!-- From: file:/E:/Android%20Project/SearchImageTool/app/src/main/res/menu/menu_image_search_online.xml -->

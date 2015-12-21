@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="80dp">
+    <ImageView
+        android:id="@+id/btn_sc"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        />
+</LinearLayout><!-- From: file:/E:/Android%20Project/SearchImageTool/app/src/main/res/layout/buton_social.xml -->

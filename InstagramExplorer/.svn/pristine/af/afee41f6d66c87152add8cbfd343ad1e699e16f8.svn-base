@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <SwitchPreference
+        android:title="Twitter"
+        android:key="twitter"
+        android:summary="Add accout Twitter to SearchTool"/>
+    <SwitchPreference
+        android:title="Flickr"
+        android:key="flickr"
+        android:summary="Add accout Flickr to SearchTool"/>
+    <SwitchPreference
+        android:title="Instargam"
+        android:key="instargam"
+        android:summary="Add accout Instargam to SearchTool"/>
+    <SwitchPreference
+        android:title="PX500"
+        android:key="px"
+        android:summary="Add accout PX500 to SearchTool"/>
+    <SwitchPreference
+        android:title="Search Image"
+        android:key="image"
+        android:summary="Add accout Search Image to SearchTool"/>
+</PreferenceScreen><!-- From: file:/E:/Android%20Project/SearchImageTool/app/src/main/res/xml/setting.xml -->

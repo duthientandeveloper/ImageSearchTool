@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/tag"
+        android:textColor="@color/colorFAB"
+        android:gravity="center_vertical"
+        android:paddingLeft="70px"
+        android:layout_width="240px"
+        android:layout_height="100px" />
+</LinearLayout><!-- From: file:/E:/Android%20Project/SearchImageTool/app/src/main/res/layout/tag_search.xml -->

@@ -1,0 +1,183 @@
+package com.example.duthientan.searchimagetool;
+
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.GridView;
+
+import android.widget.TextView;
+
+import com.example.duthientan.searchimagetool.Adapter.TagAdapter;
+import com.example.duthientan.searchimagetool.Backend.OAuthSocial;
+import com.example.duthientan.searchimagetool.Utils.Sharepreferences;
+
+import org.scribe.model.Verifier;
+
+
+public class SearchActivity extends AppCompatActivity {
+    GridView mTagLayout;
+    Button mButton;
+    Sharepreferences mSharepreference;
+    TagAdapter mTagAdapter;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_search);
+        mTagLayout = (GridView) findViewById(R.id.tag_layout);
+        mSharepreference = new Sharepreferences(getApplicationContext());
+        mTagAdapter = new TagAdapter(this, mSharepreference.getTag());
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getIntent().getStringExtra("verifier") != null) {
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    OAuthSocial.setVerifier(new Verifier(getIntent().getStringExtra("verifier")), getIntent().getStringExtra("Social"));
+                }
+            });
+            thread.start();
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        mTagLayout.setAdapter(mTagAdapter);
+        mTagLayout.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(SearchActivity.this);
+                builder.setMessage("Do you want search with tag")
+                        .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                TextView tmp = (TextView)view.findViewById(R.id.tag);
+                                if(getIntent().getBooleanExtra("Authention",true)) {
+                                    System.out.println("Hello111");
+                                    Intent intent = new Intent(SearchActivity.this, ImageOnline.class);
+                                    intent.putExtra("key", tmp.getText());
+                                    intent.putExtra("Social", getIntent().getStringExtra("Social"));
+                                    if (getIntent().getStringExtra("access_token") != null) {
+                                        intent.putExtra("access_token", getIntent().getStringExtra("access_token"));
+                                        System.out.println("Hello");
+                                    }
+                                    startActivity(intent);
+                                    finish();
+                                }else {
+                                    Intent intent = new Intent(SearchActivity.this, ImageOnline.class);
+                                    intent.putExtra("Social", getIntent().getStringExtra("Social"));
+                                    intent.putExtra("key", tmp.getText());
+                                    intent.putExtra("Authention", false);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                            }
+                        }).setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+        mTagLayout.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, final View view, int position, long id) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(SearchActivity.this);
+                builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        TextView tmp = (TextView) view;
+                        mSharepreference.removeTag(tmp.getText().toString());
+                        mTagAdapter = new TagAdapter(SearchActivity.this, mSharepreference.getTag());
+                        mTagLayout.setAdapter(mTagAdapter);
+                    }
+                }).setNegativeButton("Library", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        TextView tmp = (TextView) view;
+                        Intent intent =new Intent(SearchActivity.this,LybraryActivity.class);
+                        intent.putExtra("Key",tmp.getText().toString());
+                        startActivity(intent);
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+                return true;
+            }
+        });
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_search, menu);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        mTagLayout = (GridView) findViewById(R.id.tag_layout);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                mSharepreference.setTag(query);
+                if(getIntent().getBooleanExtra("Authention", true)) {
+                    if (getIntent().getStringExtra("Social").equals("instargram")) {
+                        System.out.println("Helllo");
+                        Intent intent = new Intent(SearchActivity.this, ImageOnline.class);
+                        intent.putExtra("Social", getIntent().getStringExtra("Social"));
+                        intent.putExtra("key", query);
+                        intent.putExtra("access_token", getIntent().getStringExtra("access_token"));
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        Intent intent = new Intent(SearchActivity.this, ImageOnline.class);
+                        intent.putExtra("Social", getIntent().getStringExtra("Social"));
+                        intent.putExtra("key", query);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+                else {
+                    Intent intent = new Intent(SearchActivity.this, ImageOnline.class);
+                    intent.putExtra("Social", getIntent().getStringExtra("Social"));
+                    intent.putExtra("key", query);
+                    intent.putExtra("Authention", false);
+                    startActivity(intent);
+                    finish();
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish();
+                return true;
+            case R.id.folder:
+                Intent intent = new Intent(SearchActivity.this, FolderImageActivity.class);
+                startActivity(intent);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+}
